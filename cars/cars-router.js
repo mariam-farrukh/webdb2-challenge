@@ -69,25 +69,25 @@ router.delete('/:id', (req, res) => {
 function validateCar(req, res, next) {
     const {VIN, Make, Model, Mileage, Transmission, Title} = req.body;
     if(!VIN && !Make && !Model && !Mileage && !Transmission && !Title ){
-        return res.status(400).json({message: "Can't create, missing data"});
+        return res.status(400).json({error: "Can't create, missing data"});
     }
     if(!VIN){
-        return res.status(400).json({message: "Must have VIN"});
+        return res.status(400).json({error: "Must have VIN"});
     }
     if(!Make){
-        return res.status(400).json({message: "Must have car Make"});
+        return res.status(400).json({error: "Must have car Make"});
     }
     if(!Model){
-        return res.status(400).json({message: "Must have car Model"});
+        return res.status(400).json({error: "Must have car Model"});
     }
     if(!Mileage){
-        return res.status(400).json({message: "Must include Mileage"});
+        return res.status(400).json({error: "Must include Mileage"});
     }
     if(!Transmission){
-        return res.status(400).json({message: "Must have Transmission type"});
+        return res.status(400).json({error: "Must have Transmission type"});
     }
     if(!Title){
-        return res.status(400).json({message: "Must have status of title"});
+        return res.status(400).json({error: "Must have status of title"});
     }
     if(VIN.length !== 17){
         return res.status(400).json({error: "VIN is not possible, VIN should have 17 characters."});
