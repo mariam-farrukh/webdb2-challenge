@@ -30,7 +30,40 @@ router.post('/', validateCar, (req, res) => {
         });
 });
 
+router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+    db('cars')
+    .where({id})
+    .update(changes)
+    .then(count => {
+      if (count) {
+        res.status(200).json({ message: 'Successfully updated Car information' });
+      } else {
+        res.status(404).json({ message: 'Could not find this car to update' });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({ message: 'Error updating car from database' });
+    });
+});
 
+router.delete('/:id', (req, res) => {
+    const { id } = req.params;
+    db('cars')
+    .where({ id })
+    .truncate()
+    .then(count => {
+        if (count) {
+          res.status(200).json({ message: 'Successfully deleted the car deleted' });
+        } else {
+          res.status(404).json({ message: "Could not find this car to delete" });
+        }
+    })
+    .catch(err => {
+        res.status(500).json({ message: "Could not delete car, can't access database" });
+    });
+});
 //middleware
 
 function validateCar(req, res, next) {
