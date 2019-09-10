@@ -83,17 +83,14 @@ function validateCar(req, res, next) {
     if(!Mileage){
         return res.status(400).json({message: "Must include Mileage"});
     }
-    if(isNaN(Mileage)){
-        return res.status(400).json({message: "Mileage has to be numbers"});
-    }
     if(!Transmission){
         return res.status(400).json({message: "Must have Transmission type"});
     }
     if(!Title){
         return res.status(400).json({message: "Must have status of title"});
     }
-    if(VIN.length > 128){
-        return res.status(400).json({error: "VIN number is not possible, VIN has 17 characters, so must be shorter than 128."});
+    if(VIN.length !== 17){
+        return res.status(400).json({error: "VIN is not possible, VIN should have 17 characters."});
     }
     next();
 }

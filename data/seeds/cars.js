@@ -7,7 +7,7 @@ exports.seed = function(knex) {
       // Inserts seed entries
       return knex('cars').insert([
         {
-          VIN : '123456', 
+          VIN : '1a2b3c4d5e6f7g8h9', 
           Make: 'Nissan', 
           Model: 'Rogue', 
           Mileage: 1000, 
@@ -15,7 +15,7 @@ exports.seed = function(knex) {
           Title: 'Clean'
         },
         {
-          VIN : '23456', 
+          VIN : '2b3c4d5e6f7g8h9i1', 
           Make: 'Nissan', 
           Model: 'Rogue XL', 
           Mileage: 10000, 
