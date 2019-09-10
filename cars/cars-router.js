@@ -1,92 +1,68 @@
-const express = require("express");
-
+const express = require('express');
 const db = require('../data/db-config.js');
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  db("cars")
-    .then(cars => {
-      res.status(200).json(cars);
-    })
-    .catch(err => {
-      res.status(400).json({ message: "Unable to fetch cars from database" });
-    });
+router.get('/', (req, res) => {
+    db('cars')
+        .then(cars => {
+            res.json(cars);
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({error: 'Could not get cars information from database'});
+        });
 });
 
-router.get("/:id", (req, res) => {
-  const { id } = req.params;
-  db("cars")
-    .where({ id: id })
-    .then(car => {
-      if (car[0]) {
-        res.status(200).json(car[0]);
-      } else {
-        res.status(404).json({ message: "Car does not exist" });
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: "Error fetching car from database" });
-    });
+router.post('/', validateCar, (req, res) => {
+    const newCar = req.body;
+    db('cars')
+        .insert(newCar)
+        .then(ids => {
+            db('cars').where({id: ids[0]})
+            .then(newCar => {
+                res.status(201).json(newCar);
+            });
+        })
+        .catch(err => {
+            console.log('Post err', err);
+            res.status(500).json({message: 'Could not store data'});
+        });
 });
 
-router.post("/", (req, res) => {
-  const newCar = req.body;
 
-  if (!newCar.VIN || newCar.VIN.length < 17 || newCar.VIN.length > 17) {
-    return res.status(404).json({ message: "Please enter valid VIN number" });
-  }
-  if (!newCar.make) {
-    return res.status(404).json({ message: "Please add make of car" });
-  }
-  if (!newCar.model) {
-    return res.status(404).json({ message: "Please add model of car" });
-  }
-  if (!newCar.mileage) {
-    return res.status(404).json({ message: "Please add mileage of car" });
-  }
-  db("cars")
-    .insert(newCar, "id")
-    .then(count => {
-      res.status(201).json(count);
-    })
-    .catch(err => {
-      res.status(500).json({ message: "Unable to add car to database" });
-    });
-});
+//middleware
 
-router.delete("/:id", (req, res) => {
-  const { id } = req.params;
-  db("cars")
-    .where({ id: id })
-    .del()
-    .then(count => {
-      if (count) {
-        res.status(200).json({ message: " Car has been deleted" });
-      } else {
-        res.status(404).json({ message: "Car does not exist" });
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: "Unable to delete from database" });
-    });
-});
+function validateCar(req, res, next) {
+    const {VIN, Make, Model, Mileage, Transmission, Title} = req.body;
+    if(!VIN && !Make && !Model && !Mileage && !Transmission && !Title ){
+        return res.status(400).json({message: "Can't create, missing data"});
+    }
+    if(!VIN){
+        return res.status(400).json({message: "Must have VIN"});
+    }
+    if(!Make){
+        return res.status(400).json({message: "Must have car Make"});
+    }
+    if(!Model){
+        return res.status(400).json({message: "Must have car Model"});
+    }
+    if(!Mileage){
+        return res.status(400).json({message: "Must include Mileage"});
+    }
+    if(isNaN(Mileage)){
+        return res.status(400).json({message: "Mileage has to be numbers"});
+    }
+    if(!Transmission){
+        return res.status(400).json({message: "Must have Transmission type"});
+    }
+    if(!Title){
+        return res.status(400).json({message: "Must have status of title"});
+    }
+    if(VIN.length > 128){
+        return res.status(400).json({error: "VIN number is not possible, VIN has 17 characters, so must be shorter than 128."});
+    }
+    next();
+}
 
-router.put("/:id", (req, res) => {
-  const { id } = req.params;
-  const changes = req.body;
-  db("cars")
-    .where({ id: id })
-    .update(changes)
-    .then(count => {
-      if (count) {
-        res.status(200).json(count);
-      } else {
-        res.status(500).json({ message: " Car not found" });
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: "Unable to update car in database" });
-    });
-});
 module.exports = router;
