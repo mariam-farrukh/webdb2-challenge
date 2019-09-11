@@ -64,8 +64,8 @@ router.delete('/:id', (req, res) => {
         res.status(500).json({ message: "Could not delete car, can't access database" });
     });
 });
-//middleware
 
+//Middleware to validate all entries of new car
 function validateCar(req, res, next) {
     const {VIN, Make, Model, Mileage, Transmission, Title} = req.body;
     if(!VIN && !Make && !Model && !Mileage && !Transmission && !Title ){
